@@ -1,0 +1,11 @@
+plate,vehicle_type,access_category,owner_name,governorate,subscription_end,notes
+111 TU 2222,car,subscribed,Société Atlas Parking,Tunis,2026-12-31,Abonné mensuel actif
+777 TU 7777,car,vip,Ministère du Transport,Tunis,2099-12-31,Accès prioritaire permanent
+999 TU 0001,truck,conditional,LogiTrans SA,Ben Arous,2026-06-30,Autorisé 06h-22h uniquement
+123 TU 4567,car,blacklist,Unknown,Ariana,2025-12-31,Refusé suite incident sécurité
+204 TU 9811,motorcycle,visitor,Karim Ben Ali,Sfax,,Visiteur standard
+315 TU 6420,car,visitor,Amira Jebali,Sousse,,Visiteur standard
+501 TU 7700,car,subscribed,Hôpital Charles Nicolle,Tunis,2027-01-15,Abonnement institutionnel
+612 TU 3388,van,conditional,Société Nettoyage Rapide,Monastir,2026-09-01,Accès livraison journée
+709 TU 4401,car,vip,Présidence,Tunis,2099-12-31,Flotte officielle
+888 TU 9002,car,blacklist,Unknown,Bizerte,2026-04-01,Blackliste administrative

@@ -1,0 +1,23 @@
+{
+  "country": "Tunisia",
+  "currency": "TND",
+  "free_minutes": 10,
+  "hourly_rate": 2.5,
+  "category_multiplier": {
+    "visitor": 1.0,
+    "subscribed": 0.7,
+    "conditional": 1.2,
+    "vip": 0.0,
+    "blacklist": 999.0
+  },
+  "conditional_access": {
+    "start_hour": 6,
+    "end_hour": 22
+  },
+  "vehicle_defaults": {
+    "car": "visitor",
+    "truck": "conditional",
+    "motorcycle": "visitor",
+    "van": "visitor"
+  }
+}

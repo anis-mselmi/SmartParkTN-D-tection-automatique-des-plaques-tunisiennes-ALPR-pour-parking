@@ -1,0 +1,11 @@
+image_name,plate_text,bbox_x,bbox_y,bbox_w,bbox_h,lighting,weather,angle_deg,blur_level,resolution,site
+tn_gate_0001.jpg,111 TU 2222,512,344,214,64,daylight,clear,4,low,1920x1080,Tunis_Centre
+tn_gate_0002.jpg,777 TU 7777,486,360,226,66,night,clear,7,medium,1920x1080,Tunis_Centre
+tn_gate_0003.jpg,999 TU 0001,502,350,240,72,daylight,rain,12,medium,1280x720,BenArous_ZoneA
+tn_gate_0004.jpg,123 TU 4567,515,372,218,68,dusk,clear,10,high,1280x720,Ariana_North
+tn_gate_0005.jpg,204 TU 9811,530,390,188,52,night,clear,5,low,1920x1080,Sfax_Main
+tn_gate_0006.jpg,315 TU 6420,498,338,222,65,daylight,clear,3,low,1920x1080,Sousse_Centre
+tn_gate_0007.jpg,501 TU 7700,545,350,210,63,night,fog,6,medium,1920x1080,Tunis_Centre
+tn_gate_0008.jpg,612 TU 3388,478,364,232,70,daylight,clear,14,medium,1280x720,Monastir_Gate1
+tn_gate_0009.jpg,709 TU 4401,522,347,224,66,daylight,clear,4,low,1920x1080,Tunis_VIP
+tn_gate_0010.jpg,888 TU 9002,509,375,219,67,night,rain,11,high,1280x720,Bizerte_Port
