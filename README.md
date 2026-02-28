@@ -3,11 +3,13 @@
   🚗 SmartPark Tunisie
   <br>
   <br>
-</h1>
 <p align="center">
   <img src="Gemini_Generated_Image_3ingj23ingj23ing.png" 
        alt="Project Logo" 
-       width="250"/>
+       width="300"/>
+  <img src="613028162_122094201069219775_5136553026292291551_n.jpg" 
+       alt="Additional Image" 
+       width="300"/>
 </p>
 <h4 align="center">Système Intelligent de Gestion de Parking : ALPR (Reconnaissance de Plaques) + Assistant Métier IA (RAG)</h4>
 
