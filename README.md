@@ -6,7 +6,7 @@
 <p align="center">
   <img src="Gemini_Generated_Image_3ingj23ingj23ing.png" 
        alt="Project Logo" 
-       width="300"/>
+       width="350"/>
   <img src="613028162_122094201069219775_5136553026292291551_n.jpg" 
        alt="Additional Image" 
        width="300"/>
