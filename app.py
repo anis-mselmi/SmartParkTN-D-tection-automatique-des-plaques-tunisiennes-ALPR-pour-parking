@@ -597,6 +597,9 @@ def render_alpr_tab(alpr, rules, storage):
         st.caption(f"Détecteur: {result.detector_used} | OCR: {result.ocr_used}")
 
     with right:
+        if getattr(result, "error_message", None):
+            st.error(f"⚠️ {result.error_message}")
+            
         st.markdown("<div class='smartpark-kpi'><b>Plaque lue</b><br>" + result.plate_text + "</div>", unsafe_allow_html=True)
         st.markdown("<div class='smartpark-kpi'><b>Confiance OCR</b><br>" + f"{result.confidence:.2f}" + "</div>", unsafe_allow_html=True)
         st.markdown("<div class='smartpark-kpi'><b>Plaques détectées</b><br>" + str(len(detected_plates)) + "</div>", unsafe_allow_html=True)
@@ -713,7 +716,7 @@ def render_assistant_tab(assistant, rag):
     st.markdown("- Quelle procédure suivre pour une sortie ?")
 
 
-def render_corner_chatbot(assistant, rag):
+def render_sidebar_chatbot(assistant, rag):
     if "assistant_chat_history" not in st.session_state:
         st.session_state.assistant_chat_history = [
             {
@@ -723,44 +726,32 @@ def render_corner_chatbot(assistant, rag):
                 "highlights": [],
             }
         ]
-    if "chatbot_open" not in st.session_state:
-        st.session_state.chatbot_open = False
 
-    with st.container(key="chatbot_toggle"):
-        toggle_label = "✕" if st.session_state.chatbot_open else "💬"
-        if st.button(toggle_label, key="toggle_corner_chatbot"):
-            st.session_state.chatbot_open = not st.session_state.chatbot_open
+    with st.sidebar:
+        st.markdown("## 💬 SmartPark Chatbot\n**RAG · Règlements · Tarifs**")
+        if st.button("🧹 Nouvelle conversation", use_container_width=True):
+            st.session_state.assistant_chat_history = [
+                {
+                    "role": "assistant",
+                    "content": "Conversation réinitialisée. Comment puis-je vous aider ?",
+                    "sources": [],
+                    "highlights": [],
+                }
+            ]
             st.rerun()
 
-    if not st.session_state.chatbot_open:
-        return
-
-    with st.container(key="chatbot_corner"):
-        head_l, head_r = st.columns([4, 1])
-        with head_l:
-            st.markdown("**SmartPark Chatbot**")
-            st.caption("RAG · Règlements · Tarifs · Accès")
-        with head_r:
-            if st.button("🧹", key="clear_corner_chat", help="Nouvelle conversation"):
-                st.session_state.assistant_chat_history = [
-                    {
-                        "role": "assistant",
-                        "content": "Conversation réinitialisée. Comment puis-je vous aider ?",
-                        "sources": [],
-                        "highlights": [],
-                    }
-                ]
-                st.rerun()
-
+        st.caption("Questions rapides:")
         q1, q2, q3 = st.columns(3)
-        if q1.button("Refus", key="quick_refus", use_container_width=True):
+        if q1.button("Refus"):
             st.session_state.pending_question = "Pourquoi un véhicule est refusé à l'entrée ?"
-        if q2.button("Tarif", key="quick_tarif", use_container_width=True):
+        if q2.button("Tarifs"):
             st.session_state.pending_question = "Quel est le tarif visiteur et la franchise ?"
-        if q3.button("Sortie", key="quick_sortie", use_container_width=True):
+        if q3.button("Sortie"):
             st.session_state.pending_question = "Quelle est la procédure de sortie ?"
 
-        with st.container(key="chatbot_messages"):
+        st.divider()
+
+        with st.container(height=400):
             for msg in st.session_state.assistant_chat_history[-8:]:
                 with st.chat_message(msg["role"]):
                     st.markdown(msg["content"])
@@ -769,18 +760,16 @@ def render_corner_chatbot(assistant, rag):
                     if msg.get("sources"):
                         st.caption("Sources: " + " | ".join(msg["sources"]))
 
-        with st.form("corner_chat_form", clear_on_submit=True):
+        with st.form("sidebar_chat_form", clear_on_submit=True):
             context = st.text_input(
-                "Contexte",
+                "Contexte (optionnel)",
                 value="",
-                placeholder="Ex: Plaque 123 TU 4567 à 23h45",
-                key="corner_context",
+                placeholder="Ex: Plaque 123 TU 4567 à 23h45"
             )
             prompt = st.text_input(
                 "Message",
                 value="",
                 placeholder="Posez votre question métier...",
-                key="corner_prompt",
                 label_visibility="collapsed",
             )
             send = st.form_submit_button("Envoyer", use_container_width=True)
@@ -864,4 +853,4 @@ with tab2:
 with tab3:
     render_assistant_tab(assistant, rag)
 
-render_corner_chatbot(assistant, rag)
+render_sidebar_chatbot(assistant, rag)

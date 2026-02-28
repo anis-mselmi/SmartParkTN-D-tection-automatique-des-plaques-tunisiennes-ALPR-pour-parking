@@ -1,11 +1,20 @@
+import os
 from datetime import datetime
+from dotenv import load_dotenv
+from huggingface_hub import InferenceClient
 
 from .rag import SimpleRAG
 
+load_dotenv()
+HF_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
 
 class ParkingAssistant:
     def __init__(self, rag: SimpleRAG) -> None:
         self.rag = rag
+        if HF_API_KEY:
+            self.client = InferenceClient(api_key=HF_API_KEY)
+        else:
+            self.client = None
 
     def answer(self, question: str, context: str = "") -> dict:
         normalized_question = (question or "").strip()
@@ -26,32 +35,47 @@ class ParkingAssistant:
                 "highlights": [],
             }
 
-        top = docs[0]
         highlights = []
+        snippets = []
         for d in docs:
             highlights.append(f"{d['source']} · score {d['score']:.2f}")
+            snippets.append(d['snippet'])
 
-        answer_lines = [
-            "Voici la meilleure réponse basée sur les documents internes.",
-            f"Question: {normalized_question}",
-        ]
+        context_text = "\n---\n".join(snippets)
 
-        if context:
-            answer_lines.append(f"Contexte pris en compte: {context}")
+        if self.client:
+            prompt = f"""Tu es un assistant IA spécialisé dans les règlements du parking SmartPark. 
+Utilise UNIQUEMENT le contexte documentaire ci-dessous pour répondre à la question de l'utilisateur.
+Réponds en français, de manière claire, concise et professionnelle. Si la réponse n'est pas dans le document, dis-le poliment.
 
-        answer_lines.extend(
-            [
-                "",
-                "Synthèse:",
-                top["snippet"],
-                "",
-                f"Référence principale: {top['source']}",
-                f"Horodatage: {datetime.now().isoformat(timespec='seconds')}",
-            ]
-        )
+Documents de référence:
+{context_text}
 
+Informations supplémentaires (contexte du véhicule): {context}
+
+Question de l'utilisateur: {normalized_question}
+
+Réponse:"""
+
+            try:
+                # Using Mistral 7B / Qwen 2.5 72B for excellent multilingual text generation
+                model_id = "Qwen/Qwen2.5-72B-Instruct"
+                response = self.client.chat.completions.create(
+                    model=model_id,
+                    messages=[{"role": "user", "content": prompt}],
+                    max_tokens=300,
+                    temperature=0.3
+                )
+                final_answer = response.choices[0].message.content.strip()
+            except Exception as e:
+                # Fallback to pure snippet if API fails
+                final_answer = f"⚠️ Erreur de l'API IA: {e}\n\nSynthèse brute depuis les documents:\n{docs[0]['snippet']}"
+        else:
+            final_answer = f"⚠️ L'IA est désactivée (Clé API Hugging Face manquante). Voici l'extrait brut :\n{docs[0]['snippet']}"
+            
         return {
-            "answer": "\n".join(answer_lines),
+            "answer": final_answer,
             "sources": [d["source"] for d in docs],
             "highlights": highlights,
         }
+

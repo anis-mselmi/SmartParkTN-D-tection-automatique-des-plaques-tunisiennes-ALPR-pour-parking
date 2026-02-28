@@ -20,10 +20,20 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
+import os
+import io
+import base64
+import requests
+from dotenv import load_dotenv
+from huggingface_hub import InferenceClient
+
 import numpy as np
 from PIL import Image, ImageOps
 
 from .config import TUNISIAN_PLATE_REGEX
+
+load_dotenv()
+HF_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
 
 try:
     import cv2  # type: ignore
@@ -54,6 +64,7 @@ class AlprResult:
     candidate_bboxes: list[tuple[int, int, int, int]]
     candidate_texts: list[tuple[str, float]]
     detected_plates: list[DetectedPlate] = field(default_factory=list)
+    error_message: Optional[str] = None
 
 
 @dataclass
@@ -400,6 +411,83 @@ class ALPRPipeline:
         text = re.sub(r"\s+", " ", text).strip()
         return text
 
+    def _hf_ocr(self, img_array: np.ndarray) -> tuple[str, float, str, Optional[str]]:
+        if not HF_API_KEY:
+            return "UNKNOWN", 0.1, "fallback", None
+        try:
+            # Scale up the image if it is too small. 
+            # VLMs like Qwen2.5-VL will crash (500 Internal Error) if the crop is smaller than the model's patch size (e.g. 55x12).
+            h, w = img_array.shape[:2]
+            if min(h, w) < 256:
+                scale = 256.0 / min(h, w)
+                if cv2 is not None:
+                    try:
+                        img_array = cv2.resize(img_array, None, fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
+                    except:
+                        pass
+            
+            # Prepare image for API passing
+            pil_img = Image.fromarray(cv2.cvtColor(img_array, cv2.COLOR_BGR2RGB)) if cv2 is not None else Image.fromarray(img_array)
+            buffer = io.BytesIO()
+            pil_img.save(buffer, format="JPEG")
+            img_bytes = buffer.getvalue()
+            b64_img = base64.b64encode(img_bytes).decode("utf-8")
+            
+            # Initialize the client
+            client = InferenceClient(api_key=HF_API_KEY)
+            
+            # Switch to Qwen as recommended for OCR capabilities & API stability
+            model_id = "Qwen/Qwen2.5-VL-7B-Instruct"
+            messages = [
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text", 
+                            "text": "Extract ONLY the characters and numbers of the license plate in this image. The plate might be angled. Do not include any other text or prefixes."
+                        },
+                        {
+                            "type": "image_url", 
+                            "image_url": {"url": f"data:image/jpeg;base64,{b64_img}"}
+                        }
+                    ]
+                }
+            ]
+            
+            response = client.chat.completions.create(
+                model=model_id,
+                messages=messages,
+                max_tokens=50
+            )
+            
+            raw_text = response.choices[0].message.content.strip()
+            cleaned = self._clean_plate_text(raw_text)
+            if self._is_plate_like_text(cleaned):
+                return cleaned, 0.95, "hf-Qwen2.5-VL", None
+            
+            # Fallback to microsoft/trocr-large-printed if VLM chat completions API fails to extract plate
+            url_fallback = "https://router.huggingface.co/hf-inference/models/microsoft/trocr-large-printed"
+            resp_fallback = requests.post(
+                url_fallback, 
+                headers={"Authorization": f"Bearer {HF_API_KEY}"}, 
+                data=img_bytes, 
+                timeout=10
+            )
+            if resp_fallback.status_code == 200:
+                res_json = resp_fallback.json()
+                if isinstance(res_json, list) and len(res_json) > 0:
+                    raw_text = res_json[0].get("generated_text", "")
+                    cleaned = self._clean_plate_text(raw_text)
+                    if self._is_plate_like_text(cleaned):
+                        return cleaned, 0.85, "hf-trocr", None
+                        
+        except Exception as e:
+            err_msg = f"HF API OCR Error: {str(e)}"
+            print(err_msg)
+            return "UNKNOWN", 0.1, "fallback", err_msg
+            
+        return "UNKNOWN", 0.1, "fallback", None
+
     def _ocr(self, plate_crop: np.ndarray, filename_hint: Optional[str] = None) -> tuple[str, float, str]:
         if self.reader is not None:
             try:
@@ -512,12 +600,31 @@ class ALPRPipeline:
         best_bbox = bboxes[0] if bboxes else (0, 0, image.shape[1], image.shape[0])
         best_backend = "fallback"
         best_score = -1.0
+        best_error = None
 
         for bbox in bboxes:
             x, y, w, h = bbox
             crop = image[y: y + h, x: x + w]
             if crop.size == 0:
                 continue
+
+            # Try HF API on the raw unrotated crop. VLMs handle angle intrinsically.
+            if HF_API_KEY:
+                hf_text, hf_conf, hf_backend, hf_error = self._hf_ocr(crop)
+                if hf_error and not best_error:
+                    best_error = hf_error
+                if hf_text != "UNKNOWN":
+                    fmt = self._plate_format_score(hf_text)
+                    length_bonus = 0.08 if 6 <= len(hf_text) <= 12 else 0.0
+                    total = 0.64 * hf_conf + 0.30 * fmt + length_bonus
+                    if total > best_score:
+                        best_score, best_text, best_conf = total, hf_text, hf_conf
+                        best_bbox, best_backend = bbox, hf_backend
+                    scored_candidates.append(
+                        PlateCandidate(bbox=bbox, text=hf_text, confidence=hf_conf, score=total)
+                    )
+                    continue  # Skip traditional easyOCR rotation variants since VLM succeeded
+
             for variant in self._generate_robust_variants(crop):
                 plate_text, conf, ocr_backend = self._ocr(variant, filename_hint)
                 # Only consider text that actually looks like a plate number
@@ -612,4 +719,5 @@ class ALPRPipeline:
             candidate_bboxes=valid_bboxes,
             candidate_texts=dedup_texts,
             detected_plates=detected_plates,
+            error_message=best_error,
         )
