@@ -6,8 +6,8 @@
 </h1>
 <p align="center">
   <img src="Gemini_Generated_Image_3ingj23ingj23ing.png" 
-       alt="Generated Illustration" 
-       width="850"/>
+       alt="Project Logo" 
+       width="200"/>
 </p>
 <h4 align="center">Système Intelligent de Gestion de Parking : ALPR (Reconnaissance de Plaques) + Assistant Métier IA (RAG)</h4>
 
