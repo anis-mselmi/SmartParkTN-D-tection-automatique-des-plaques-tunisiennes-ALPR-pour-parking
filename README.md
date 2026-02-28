@@ -4,7 +4,11 @@
   <br>
   <br>
 </h1>
-
+<p align="center">
+  <img src="Gemini_Generated_Image_3ingj23ingj23ing.png" 
+       alt="Generated Illustration" 
+       width="850"/>
+</p>
 <h4 align="center">Système Intelligent de Gestion de Parking : ALPR (Reconnaissance de Plaques) + Assistant Métier IA (RAG)</h4>
 
 <p align="center">
@@ -41,6 +45,11 @@ En scannant *directement le flux vidéo* des caméras à l'entrée et à la sort
   * Traitement OCR ultra-robuste adapté au format `XXX تونـس XXXX`.
   * Filtres correctifs dynamiques : Lisibilité conservée de nuit (CLAHE), sous la pluie (Denoising), en mouvement (Sharpening) ou de biais (Correction d'angle).
   * Prise en charge des **images et des scans flux vidéos dynamiques (.mp4, .avi)**.
+## 📸 Application Preview
+
+<p align="center">
+  <img src="Capture d’écran 2026-02-28 073043.png" alt="Application Screenshot" width="800"/>
+</p>
 
 * **🧠 Moteur de Décision & Catégorisation Multi-Niveaux :**
   * Attribution instantanée de profils complexes : **VIP, Abonnés, Liste Noire, Visiteurs**.
