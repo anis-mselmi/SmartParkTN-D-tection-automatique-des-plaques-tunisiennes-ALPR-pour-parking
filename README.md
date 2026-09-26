@@ -4,21 +4,43 @@
   <br>
   <br>
 <p align="center">
-  <img src="Gemini_Generated_Image_3ingj23ingj23ing.png" 
-       alt="Project Logo" 
-       width="400"/>
-  <img src="613028162_122094201069219775_5136553026292291551_n.jpg" 
-       alt="Additional Image" 
-       width="300"/>
+  <img src="logo.png" 
+       alt="SmartPark Tunisie Logo" 
+       width="450"/>
 </p>
 <h4 align="center">Système Intelligent de Gestion de Parking : ALPR (Reconnaissance de Plaques) + Assistant Métier IA (RAG)</h4>
 
 <p align="center">
+  <a href="https://github.com/anis-mselmi/SmartParkTN-D-tection-automatique-des-plaques-tunisiennes-ALPR-pour-parking/stargazers" target="_blank">
+    <img src="https://img.shields.io/badge/⭐%20Stars-16%2B-yellow?style=for-the-badge&logo=github&logoColor=white" alt="Stars 16+" />
+  </a>
+  &nbsp;
+  <a href="https://drive.google.com/file/d/1q6TNVnexaWD2Wd1M2PCmllsTlbBudgEF/view?usp=sharing" target="_blank">
+    <img src="https://img.shields.io/badge/▶%20Vidéo%20Démo-Google%20Drive-red?style=for-the-badge&logo=google-drive&logoColor=white" alt="Demo Video" />
+  </a>
+</p>
+
+<p align="center">
+  <a href="#démonstration-vidéo">Démo Vidéo</a> •
   <a href="#problématique">Problématique</a> •
   <a href="#notre-solution">Notre Solution</a> •
   <a href="#fonctionnalités-clés">Fonctionnalités Clés</a> •
   <a href="#architecture-technique">Architecture Technique</a> •
   <a href="#lancer-le-projet">Lancer le projet</a>
+</p>
+
+---
+
+## 🎬 Démonstration Vidéo
+
+Retrouvez la démonstration complète du projet en action :  
+👉 **[Regarder la vidéo de démonstration sur Google Drive](https://drive.google.com/file/d/1q6TNVnexaWD2Wd1M2PCmllsTlbBudgEF/view?usp=sharing)**
+
+<p align="center">
+  <a href="https://drive.google.com/file/d/1q6TNVnexaWD2Wd1M2PCmllsTlbBudgEF/view?usp=sharing" target="_blank">
+    <img src="Capture d’écran 2026-02-28 073043.png" alt="Aperçu & Démonstration Vidéo" width="800"/><br/>
+    <sub>👉 <i>Cliquez sur l'image pour ouvrir la vidéo de démonstration</i></sub>
+  </a>
 </p>
 
 ---
@@ -47,11 +69,6 @@ En scannant *directement le flux vidéo* des caméras à l'entrée et à la sort
   * Traitement OCR ultra-robuste adapté au format `XXX تونـس XXXX`.
   * Filtres correctifs dynamiques : Lisibilité conservée de nuit (CLAHE), sous la pluie (Denoising), en mouvement (Sharpening) ou de biais (Correction d'angle).
   * Prise en charge des **images et des scans flux vidéos dynamiques (.mp4, .avi)**.
-## 📸 Application Preview
-
-<p align="center">
-  <img src="Capture d’écran 2026-02-28 073043.png" alt="Application Screenshot" width="800"/>
-</p>
 
 * **🧠 Moteur de Décision & Catégorisation Multi-Niveaux :**
   * Attribution instantanée de profils complexes : **VIP, Abonnés, Liste Noire, Visiteurs**.
@@ -76,7 +93,7 @@ Ce projet est pensé pour être modulaire, rapide et local (Privacy-First) :
 - **Base de Données / Historique :** SQLite embarqué (`storage.py`) pour garantir zéro fuite de données d'immatriculation vers le cloud.
 - **RAG & Chatbot :** LangChain, modèles LLMs locaux (Ollama/Mistral) pour la compréhension documentaire.
 
-## 🚀 Lancer le projet (Pour le Jury)
+## 🚀 Lancer le projet
 
 Si vous disposez de l'environnement configuré, le lancement est immédiat via le terminal :
 
