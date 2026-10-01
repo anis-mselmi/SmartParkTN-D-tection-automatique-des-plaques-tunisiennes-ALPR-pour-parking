@@ -106,3 +106,7 @@ streamlit run app.py
 ```
 
 *Le tableau de bord s'ouvrira automatiquement à l'adresse `http://localhost:8501`. Préparez quelques fausses plaques et de petites séquences vidéos pour apprécier la démonstration !*
+
+## 📄 Licence
+
+Ce projet est distribué sous la licence MIT. Consultez le fichier [LICENSE](LICENSE) pour en connaître les conditions.
